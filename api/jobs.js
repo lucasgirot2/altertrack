@@ -1,8 +1,6 @@
-// api/jobs.js — Vercel Serverless Function
-// Proxy vers l'API La Bonne Alternance pour éviter les erreurs CORS
+const https = require('https');
 
-export default async function handler(req, res) {
-  // Autoriser les requêtes depuis n'importe quelle origine (CORS)
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -13,31 +11,29 @@ export default async function handler(req, res) {
 
   const { latitude, longitude, radius, romes } = req.query;
 
-  if (!latitude || !longitude) {
-    return res.status(400).json({ error: 'latitude et longitude sont requis' });
-  }
+  const lat = latitude || '48.9224';
+  const lng = longitude || '2.2121';
+  const rad = radius || '20';
+  const romesParam = romes
+    ? romes.split(',').map(r => `romes=${r.trim()}`).join('&')
+    : 'romes=M1705&romes=M1706&romes=M1803&romes=M1402';
+
+  const apiUrl = `https://labonnealternance.apprentissage.beta.gouv.fr/api/v2/jobs/search?${romesParam}&latitude=${lat}&longitude=${lng}&radius=${rad}&target_diploma_level=5`;
 
   try {
-    // Construction de l'URL vers l'API officielle
-    const romesParam = romes
-      ? romes.split(',').map(r => `romes=${r.trim()}`).join('&')
-      : 'romes=M1705&romes=M1706&romes=M1803&romes=M1402';
-
-    const apiUrl = `https://labonnealternance.apprentissage.beta.gouv.fr/api/v2/jobs/search?${romesParam}&latitude=${latitude}&longitude=${longitude}&radius=${radius || 20}&target_diploma_level=5`;
-
     const response = await fetch(apiUrl, {
       headers: { 'Accept': 'application/json' }
     });
 
     if (!response.ok) {
-      throw new Error(`API répondu avec ${response.status}`);
+      return res.status(response.status).json({ error: `API error ${response.status}` });
     }
 
     const data = await response.json();
     return res.status(200).json(data);
 
   } catch (error) {
-    console.error('Erreur proxy LBA:', error.message);
+    console.error('Erreur:', error.message);
     return res.status(500).json({ error: error.message });
   }
-}
+};
