@@ -1,39 +1,30 @@
-const https = require('https');
-
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  const { latitude, longitude, radius, romes } = req.query;
-
-  const lat = latitude || '48.9224';
-  const lng = longitude || '2.2121';
-  const rad = radius || '20';
-  const romesParam = romes
-    ? romes.split(',').map(r => `romes=${r.trim()}`).join('&')
-    : 'romes=M1705&romes=M1706&romes=M1803&romes=M1402';
-
-  const apiUrl = `https://labonnealternance.apprentissage.beta.gouv.fr/api/v2/jobs/search?${romesParam}&latitude=${lat}&longitude=${lng}&radius=${rad}&target_diploma_level=5`;
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    const response = await fetch(apiUrl, {
-      headers: { 'Accept': 'application/json' }
+    const tokenRes = await fetch('https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'grant_type=client_credentials&client_id=PAR_altertrack_a8f3b2c1d4e5f6a7b8c9d0e1f2a3b4c5&client_secret=demo&scope=api_offresdemploiv2'
     });
 
-    if (!response.ok) {
-      return res.status(response.status).json({ error: `API error ${response.status}` });
-    }
+    const { radius } = req.query;
+    const rad = radius || '20';
 
-    const data = await response.json();
-    return res.status(200).json(data);
+    const searchRes = await fetch(
+      `https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?motsCles=chef+de+projet+digital+alternance&commune=95088&rayon=${rad}&typeContrat=CIE,CA&range=0-49`,
+      { headers: { 'Accept': 'application/json' } }
+    );
 
-  } catch (error) {
-    console.error('Erreur:', error.message);
-    return res.status(500).json({ error: error.message });
+    if (!searchRes.ok) throw new Error(`France Travail: ${searchRes.status}`);
+    const data = await searchRes.json();
+    return res.status(200).json({ source: 'francetravail', data });
+
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 };
