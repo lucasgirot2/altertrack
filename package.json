@@ -1,0 +1,11 @@
+{
+  "name": "altertrack",
+  "version": "1.0.0",
+  "description": "Tracker d'alternance - Chef de projet digital & IA",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
