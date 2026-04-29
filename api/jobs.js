@@ -5,9 +5,7 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const CLIENT_ID = 'PAR_altertrack_aa4922c1549db67b92b4305c82fac9e804ccbb79908fa054abc9b0f529d1c995
-
-';
+  const CLIENT_ID = 'PAR_altertrack_aa4922c1549db67b92b4305c82fac9e804ccbb79908fa054abc9b0f529d1c995';
   const CLIENT_SECRET = 'd779d51244a1725524e56b6c531d52930b9f613735758317912e02fafba5b376';
   const rad = req.query.radius || '20';
 
@@ -16,7 +14,7 @@ module.exports = async function handler(req, res) {
     params.append('grant_type', 'client_credentials');
     params.append('client_id', CLIENT_ID);
     params.append('client_secret', CLIENT_SECRET);
-    params.append('scope', 'api_offresdemploiv2');
+    params.append('scope', 'api_offresdemploiv2 application_PAR_altertrack_aa4922c1549db67b92b4305c82fac9e804ccbb79908fa054abc9b0f529d1c995');
 
     const tokenRes = await fetch(
       'https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire',
