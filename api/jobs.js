@@ -5,8 +5,8 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const CLIENT_ID = 'TON_CLIENT_ID';
-  const CLIENT_SECRET = 'TA_CLE_SECRETE';
+  const CLIENT_ID = process.env.FT_CLIENT_ID;
+ const CLIENT_SECRET = process.env.FT_CLIENT_SECRET;
   const rad = req.query.radius || '20';
 
   try {
