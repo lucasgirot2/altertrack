@@ -352,20 +352,22 @@
         remote: j.contract?.remote,
       }));
 
-      (data.jobs?.offres_emploi_partenaires || []).forEach(j => jobs.push({
-        id: j.identifier?.id || crypto.randomUUID(),
-        title: j.offer?.title || 'Poste en alternance',
-        company: j.workplace?.name || j.workplace?.brand || 'Entreprise',
-        location: j.workplace?.location?.address || '',
-        desc: j.offer?.description || '',
-        source: j.identifier?.partner_label || 'Partenaire',
-        sourceBadge: 'partner',
-        url: j.apply?.url || 'https://labonnealternance.apprentissage.beta.gouv.fr',
-        date: j.publication?.creation,
-        remote: j.contract?.remote,
-      }));
+     let jobs = [];
 
-      allOffers = jobs;
+(data.resultats || []).forEach(j => jobs.push({
+  id: j.id || Math.random().toString(36),
+  title: j.intitule || 'Poste en alternance',
+  company: j.entreprise?.nom || 'Entreprise',
+  location: j.lieuTravail?.libelle || '',
+  desc: j.description || '',
+  source: 'France Travail',
+  sourceBadge: 'lba',
+  url: j.origineOffre?.urlOrigine || 'https://francetravail.fr',
+  date: j.dateCreation,
+  remote: null,
+}));
+
+allOffers = jobs;
       document.getElementById('badge-offers').textContent = jobs.length;
       document.getElementById('api-credit').innerHTML = `Source : <a href="https://labonnealternance.apprentissage.beta.gouv.fr" target="_blank">La Bonne Alternance</a> (API officielle) · Actualisé le ${new Date().toLocaleTimeString('fr-FR')}`;
       renderOffers();
