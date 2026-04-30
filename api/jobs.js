@@ -25,7 +25,7 @@ module.exports = async function handler(req, res) {
     const { access_token } = await tokenRes.json();
 
     const searchRes = await fetch(
-      `https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?motsCles=chef+de+projet+digital&commune=95088&rayon=${rad}&typeContrat=CIE,CA&range=0-49`,
+      `https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?motsCles=chef+de+projet&commune=95063&rayon=${rad}&range=0-49`,
       {
         headers: {
           'Accept': 'application/json',
