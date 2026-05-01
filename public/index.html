@@ -337,21 +337,6 @@
       if (!res.ok) throw new Error(`Erreur ${res.status}`);
       const data = await res.json();
 
-      let jobs = [];
-
-      (data.jobs?.offres_emploi_lba || []).forEach(j => jobs.push({
-        id: j.identifier?.id || crypto.randomUUID(),
-        title: j.offer?.title || 'Poste en alternance',
-        company: j.workplace?.name || j.workplace?.brand || 'Entreprise',
-        location: j.workplace?.location?.address || '',
-        desc: j.offer?.description || '',
-        source: 'La Bonne Alternance',
-        sourceBadge: 'lba',
-        url: j.apply?.url || 'https://labonnealternance.apprentissage.beta.gouv.fr',
-        date: j.publication?.creation,
-        remote: j.contract?.remote,
-      }));
-
      let jobs = [];
 
 (data.resultats || []).forEach(j => jobs.push({
