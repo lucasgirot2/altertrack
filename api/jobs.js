@@ -29,7 +29,7 @@ module.exports = async function handler(req, res) {
 
     const { access_token } = await tokenRes.json();
 
-    const keywords = ['chef de projet digital', 'chef de projet IA', 'product owner', 'automatisation'];
+    const keywords = ['chef de projet', 'product owner', 'digital', 'alternance IA'];
     const allJobs = [];
 
     const results = await Promise.all(
