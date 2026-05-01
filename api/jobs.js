@@ -32,19 +32,15 @@ module.exports = async function handler(req, res) {
     const keywords = ['chef de projet digital', 'chef de projet IA', 'product owner', 'automatisation'];
     const allJobs = [];
 
-    for (const kw of keywords) {
-      const url = `https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?motsCles=${encodeURIComponent(kw)}&departement=75,92,93,94,95,78,91,77&range=0-14`;
-      const r = await fetch(url, {
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${access_token}`
-        }
-      });
-      if (r.ok) {
-        const d = await r.json();
-        if (d.resultats) allJobs.push(...d.resultats);
-      }
-    }
+    const results = await Promise.all(
+  keywords.map(kw =>
+    fetch(`https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?motsCles=${encodeURIComponent(kw)}&departement=75,92,93,94,95,78,91,77&range=0-14`, {
+      headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${access_token}` }
+    }).then(r => r.ok ? r.json() : { resultats: [] }).catch(() => ({ resultats: [] }))
+  )
+);
+
+results.forEach(d => { if (d.resultats) allJobs.push(...d.resultats); });
 
     const unique = Array.from(new Map(allJobs.map(j => [j.id, j])).values());
     return res.status(200).json({ source: 'francetravail', resultats: unique });
